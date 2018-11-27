@@ -1,0 +1,65 @@
+Visual Inputs:  1000 , 0 , 0
+Auditory Inputs:  1000 , 250
+
+RESULTS
+
+V1:  2570 , 2851 , 9
+V2:  6 , 7 , 2
+V3:  5 , 2 , 6
+
+A1:  2633 , 2804 , 11
+A2:  151 , 4 , 2
+Auditory Direction (Polar Coordinates):  [0.1801672961230758, 7.8758791594963098]
+
+
+
+
+
+Visual Inputs:  0 , 0 , 1000
+Auditory Inputs:  1000 , 250
+
+RESULTS
+
+V1:  209 , 327 , 19
+V2:  206 , 324 , 4
+V3:  2986 , 3040 , 1913
+
+A1:  3383 , 2918 , 785
+A2:  802 , 1162 , 162
+Auditory Direction (Polar Coordinates):  [0.74477011769997459, 8.1265181687807093]
+
+Process finished with exit code 0
+
+
+
+
+Visual Inputs:  0 , 0 , 0
+Auditory Inputs:  1000 , 250
+
+RESULTS
+
+V1:  11 , 5 , 6
+V2:  7 , 6 , 5
+V3:  11 , 12 , 5
+
+A1:  2645 , 2841 , 9
+A2:  144 , 11 , 18
+Auditory Direction (Polar Coordinates):  [0.17103566809713788, 7.8804263442923999]
+
+Process finished with exit code 0
+
+
+Visual Inputs:  0 , 0 , 0
+Auditory Inputs:  1000 , 250
+
+RESULTS
+
+V1:  9 , 4 , 6
+V2:  8 , 6 , 4
+V3:  9 , 6 , 8
+
+A1:  2578 , 2844 , 20
+A2:  138 , 6 , 5
+Auditory Direction (Polar Coordinates):  [0.16816904041714142, 7.8547691834991324]
+
+Process finished with exit code 0
