@@ -7,7 +7,7 @@ class AxonalSerotoninDiffuseReceptorFactory(DiffuseReceptorFactory):
         self.weightFunction = weightFunction
         self.defaultWeightFunctionParamters = defaultWeightFunctionParamters
 
-    def constructReceptor(self, initialLevel=0, weightFunctionParamters = None):
+    def constructReceptor(self, initialLevel=0, weightFunctionParamters = None, target=None):
         if weightFunctionParamters is None:
             weightFunctionParamters = self.defaultWeightFunctionParamters
-        return AxonalSerotoninReceptor(None, self.typeString, self.weightFunction(weightFunctionParamters), initialLevel)
+        return AxonalSerotoninReceptor(target, self.typeString, self.weightFunction(weightFunctionParamters), initialLevel)

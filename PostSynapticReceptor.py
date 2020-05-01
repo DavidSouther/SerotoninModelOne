@@ -9,6 +9,12 @@ class PostSynapticReceptor(ABC):
     def boutonSpike(self):
         return
 
+    def postSynapticSpikeFeedback(self):
+        return
+    
+    def step(self):
+        return
+
     def injectCurrent(self):
         return
 

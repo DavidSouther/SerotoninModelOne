@@ -10,9 +10,13 @@ class InjectedCurrentReceptor(PostSynapticReceptor):
 
     def boutonSpike(self):
         self.currentlySpiking = True
-
-    def step(self):
-        return
+        self.lastSpikeTime = -100
+                
+                
+        dTracedt = (-trace + spikes[time-1]) *tauX
+    #    print vOld[0] - LTPThreshold, ", ", uBarLTP - LTPThreshold, "(", uBarLTP, v, ")"
+        dMyelindt = -Altd * spikes[time-1] * max(uBarLTD - LTDThreshold, 0) + Altp * trace * max(oV - LTPThreshold, 0) * max(uBarLTP - LTPThreshold, 0) # vOld[0] in place of oV     
+        dMyelindt = dMyelindt * myelinTimeConstant
 
     def injectCurrent(self):
         if self.currentlySpiking:

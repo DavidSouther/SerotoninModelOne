@@ -7,7 +7,7 @@ from SomaticSerotoninReceptorFactory import *
 from random import random, gauss
 import functools
 
-# TODO: change imports to a "import <file>" format, then call them with <file>.<class>
+# TODO: change imports to a "import <file>" format, then call them with <file>.<class>, as best practices
 
 class TwoColumnNetwork(Network):
     def __init__(self, tau, parentSimulation, params, name):
@@ -98,8 +98,8 @@ class TwoColumnNetwork(Network):
         transmittersB["5HT1A"] = self.serotoninLevelB
 
         # Build the populations
-        self.populations["InputA"] = PoissonPopulation(tau, lambdaAParams, self.popCount, [], transmittersA, self, name)
-        self.populations["InputB"] = PoissonPopulation(tau, lambdaBParams, self.popCount, [], transmittersB, self, name)
+        self.populations["InputA"] = PoissonPopulation(tau, lambdaAParams, self.popCount, [], {}, self, name)
+        self.populations["InputB"] = PoissonPopulation(tau, lambdaBParams, self.popCount, [], {}, self, name)
 
         # [factorySomatic5HT2A, factorySomatic5HT1A]
         self.populations["pyramidalsA"] = Population(self.tau, pyramidalParams, self.popCount, [factorySomatic5HT2A, factorySomatic5HT1A], transmittersA, self, "Area A Pyramidal Cells")
@@ -113,8 +113,8 @@ class TwoColumnNetwork(Network):
         # Build connections
 
         # First, unimodal input
-        self.populations["InputA"].addOutboundConnections(self.populations["pyramidalsA"], self.gaussWeightWithChanceFactory(self.inputWeightA, 1.0), [factoryAxonal5HT2A], [factoryAxonal5HT2A])
-        self.populations["InputB"].addOutboundConnections(self.populations["pyramidalsB"], self.gaussWeightWithChanceFactory(self.inputWeightB, 1.0), [factoryAxonal5HT2A], [factoryAxonal5HT2A])
+        self.populations["InputA"].addOutboundConnections(self.populations["pyramidalsA"], self.gaussWeightWithChanceFactory(self.inputWeightA, 1.0), [], [factoryAxonal5HT2A])
+        self.populations["InputB"].addOutboundConnections(self.populations["pyramidalsB"], self.gaussWeightWithChanceFactory(self.inputWeightB, 1.0), [], [factoryAxonal5HT2A])
 
         # Then cross-modal input
         self.populations["InputA"].addOutboundConnections(self.populations["pyramidalsB"], self.gaussWeightWithChanceFactory(self.params["inputWeightAB"], self.params["crossModalABLikelihood"]), [], [factoryAxonal5HT2A])
@@ -147,24 +147,6 @@ class TwoColumnNetwork(Network):
         self.populations["lowThresholdsB"].addOutboundConnections(self.populations["pyramidalsA"], self.gaussWeightWithChanceFactory(self.params["LTStoPyramidalsWeight"], 1.0), [], [])
 
     # TODO: Separate out connection function factories to another library file somewhere
-
-    def setSerotoninA(self, transmittersA):
-        aKeys = ["pyramidalsA", "fastSpikingsA", "lowThresholdsA"]
-        for key in aKeys:
-            self.populations[key].setDiffuseTransmitters(transmittersA)
-            for inboundAxon in self.populations[key].inboundAxons:
-                inboundAxon.updateDistalDiffuseTransmitters(transmittersA)
-            for outboundAxon in self.populations[key].inboundAxons:
-                outboundAxon.updateDistalDiffuseTransmitters(transmittersA)
-
-    def setSerotoninB(self, transmittersB):
-        bKeys = ["pyramidalsB", "fastSpikingsB", "lowThresholdsB"]
-        for key in bKeys:
-            self.populations[key].setDiffuseTransmitters(transmittersB)
-            for inboundAxon in self.populations[key].inboundAxons:
-                inboundAxon.updateDistalDiffuseTransmitters(transmittersB)
-            for outboundAxon in self.populations[key].inboundAxons:
-                outboundAxon.updateProximalDiffuseTransmitters(transmittersB)
 
     def gaussWeightWithChanceFactory(self, inputWeight, chance):
         def weightFunction(source, target):

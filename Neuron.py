@@ -28,6 +28,23 @@ class Neuron:
         self.C = self.originalParameters["C"]
         self.v_peak = self.originalParameters["v_peak"]
 
+        # # Synapse Parameters
+        # self.K_GABA = 0
+        # self.Q_GABA = 0
+        # self.g_GABA = 0
+        # self.tau_r_GABA = 8 # ms
+        # self.tau_f_GABA = 30 # ms
+
+        # self.K_GLUT = 0
+        # self.Q_AMPA = 0
+        # self.Q_NMDA = 0
+        # self.g_AMPA = 0
+        # self.g_NMDA = 0
+        # self.tau_r_AMPA = 2 # ms
+        # self.tau_f_AMPA = 10 # ms
+        # self.tau_r_NMDA = 8 # ms
+        # self.tau_f_NMDA = 100 # ms
+
         self.tau = tau
 
         if inputs is None:
@@ -46,11 +63,6 @@ class Neuron:
         self.debug = debug
         self.type = parameters["type"]
 
-        # Init Variables and membrane equations
-        self.u = gauss(self.d, self.d/6) #self.b*self.v
-        self.dvdt = lambda v, u: (self.k * (v - self.v_r) * (v - self.v_t) - u + self.I) / self.C
-        self.dudt = lambda v, u: (self.a * (self.b * (v - self.v_r) - u))
-
         # Input
         self.externalInput = externalInput
         self.synapticInput = 0
@@ -62,6 +74,21 @@ class Neuron:
             self.diffuseTransmitters = diffuseTransmitters
         self.diffuseCurrent = 0
         self.I = 0
+
+        # Init Variables and membrane equations
+        self.u = gauss(self.d, self.d/6) #self.b*self.v
+        self.dvdt = lambda v, u: (0.04*v**2 + (5*v) + 140 - u + self.I)
+        # # self.dvdt = lambda v, u: (self.k * (v - self.v_r) * (v - self.v_t) - u + self.I) / self.C
+        self.dudt = lambda v, u: (self.a * (self.b * (v - self.v_r) - u))
+
+        # self.dQ_AMPA = lambda vlist: ((1-vlist[0])*self.K - (vlist[0]/self.tau_r_AMPA))/self.tau
+        # self.dg_AMPA = lambda vlist: ((self.tau_f_AMPA + self.tau_r_AMPA)/self.tau_fAMPA)*((2/self.tau_r_AMPA)*(1-vlist[0])*vlist[1]-(vlist[0]/self.tau_f))/self.tau
+
+        # self.dQ_NMDA = lambda vlist: ((1 - vlist[0]) * self.K - (vlist[0] / self.tau_r_NMDA)) / self.tau
+        # self.dg_NMDA = lambda vlist: ((self.tau_f_NMDA + self.tau_r_NMDA) / self.tau_f_NMDA) * ((2 / self.tau_r_NMDA) * (1 - vlist[0]) * vlist[1] - (vlist[0] / self.tau_f_NMDA)) / self.tau
+
+        # self.dQ_GABA = lambda q_GABA: ((1-q_GABA)*self.K - (q_GABA/self.tau_r))/self.tau
+        # self.dg_GABA = lambda g_GABA, q: ((self.tau_f + self.tau_r)/self.tau_f)*((2/self.tau_r)*(1-self.g_SD)*self.Q-(self.g_SD/self.tau_f))/self.tau
 
         # Recording variables
         self.vv=[]
@@ -118,8 +145,8 @@ class Neuron:
     def getInputs(self):
         return self.inputs
     
-    def setOutputs(self, outputs):
-        self.outputs = outputs
+    # def setOutputs(self, outputs):
+    #     self.outputs = outputs
         
     def addOutput(self, outputAxon):
         self.outputs.append(outputAxon)
@@ -150,23 +177,41 @@ class Neuron:
 
     def step(self):
         self.time += self.tau
-
+        # self.synapticInput = self.g_AMPA + self.g_NMDA - self.g_GABA
         self.I = self.externalInput + self.synapticInput + self.diffuseCurrent
+        # print(self.name, ":", self.synapticInput, "/", self.I)
         self.ii.append(self.I)
 
-        # Euler
-        # self.v = self.v + self.tau*(self.k*(self.v-self.v_r)*(self.v-self.v_t)-self.u+self.I)/self.C
+        # # Euler
+        # # self.v = self.v + self.tau*(self.k*(self.v-self.v_r)*(self.v-self.v_t)-self.u+self.I)/self.C
+        # self.v = self.v + self.tau*((0.04*self.v**2 + (5*self.v) + 140 - self.u + self.I) / self.C)
         # self.u = self.u + self.tau*(self.a*(self.b*(self.v-self.v_r)-self.u))
-        ## Uncomment this line if you want to simulate M-Currents
-        ## self.b = self.b + ((0.25-self.b) + (0.02 - self.b)*(max((self.V + 67),0)))/100
+
+        # self.Q_AMPA = self.Q_AMPA + self.tau*((1-self.Q_AMPA)*self.K_GLUT - (self.Q_AMPA/self.tau_r_AMPA))
+        # self.g_AMPA = self.g_AMPA + self.tau*((self.tau_f_AMPA + self.tau_r_AMPA)/self.tau_f_AMPA)*((2/self.tau_r_AMPA)*(1-self.g_AMPA)*self.Q_AMPA-(self.g_AMPA/self.tau_f_AMPA))
+
+        # self.Q_NMDA = self.Q_NMDA + self.tau*((1-self.Q_NMDA)*self.K_GLUT - (self.Q_NMDA/self.tau_r_NMDA))
+        # self.g_NMDA = self.g_NMDA + self.tau*((self.tau_f_NMDA + self.tau_r_NMDA)/self.tau_f_NMDA)*((2/self.tau_r_NMDA)*(1-self.g_NMDA)*self.Q_NMDA-(self.g_NMDA/self.tau_f_NMDA))
+
+        # self.Q_GABA = self.Q_GABA + self.tau*((1-self.Q_GABA)*self.K_GABA - (self.Q_GABA/self.tau_r_GABA))
+        # self.g_GABA = self.g_GABA + self.tau*((self.tau_f_GABA + self.tau_r_GABA)/self.tau_f_GABA)*((2/self.tau_r_GABA)*(1-self.g_GABA)*self.Q_GABA-(self.g_GABA/self.tau_f_GABA))
+
+        # # Uncomment this line if you want to simulate M-Currents
+        # # self.b = self.b + ((0.25-self.b) + (0.02 - self.b)*(max((self.V + 67),0)))/100
 
         # Runge-Kutta
         [dv, du] = self.rk4OneStep(self.dvdt, self.dudt, self.v, self.u, self.tau)
         self.v = self.v + dv
         self.u = self.u + du
 
+        self.vv.append(self.v)
+        self.bb.append(self.b)
+        self.uu.append(self.u)
+
         if self.v > self.v_peak: # Spike
-            self.spikeRecord.append([self.time,1])
+            self.spikeRecord.append(self.time)
+            for receptor in self.postSynapticReceptors:
+                receptor.postSynapticSpikeFeedback()
             self.v = self.c
             self.u = self.u + self.d
             if self.debug:
@@ -175,11 +220,12 @@ class Neuron:
                 axon.enqueue()
         if self.u > 500:
             self.u = 500
-        self.vv.append(self.v)
-        self.bb.append(self.b)
-        self.uu.append(self.u)
+
         self.synapticInput = 0
+
         # self.diffuseCurrent = 0
+        # self.K_GLUT = 0
+        # self.K_GABA = 0
 
     def getState(self):
         vars = {}
