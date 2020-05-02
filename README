@@ -1,0 +1,6 @@
+# Serotonin Model
+
+*   Use python3 3.6 or later
+*   `python -m venv .venv` is availble for the virtual environment
+    *   `source .venv/bin/activate` or `.\.venv\bin\activate`
+*   `pip install -r requirements.txt`
