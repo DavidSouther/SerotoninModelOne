@@ -10,5 +10,5 @@ source ./.venv/bin/activate
 python3 -m pip check > /dev/null || \
 	python3 -m pip install -r ./requirements.txt
 
-python3 ./TestTwoColumnNetwork.py
+python3 ./TestTwoColumnNetwork.py --mode=PLOT
 

@@ -11,7 +11,7 @@ sys.setrecursionlimit(10000)
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("mode", "WRITE", "Mode to execute. PLOT to run and plot an output, wihout saving an intermediate simulation. RUN for running the simulation & saving a pickled output, WRITE to read a pickled output and generate figures.")
+flags.DEFINE_string("mode", "PLOT", "Mode to execute. PLOT to run and plot an output, wihout saving an intermediate simulation. RUN for running the simulation & saving a pickled output, WRITE to read a pickled output and generate figures.")
 flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
 
 def loadParams():
