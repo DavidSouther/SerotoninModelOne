@@ -1,3 +1,4 @@
+from absl import logging 
 from DiffuseReceptor import *
 
 class AxonalSerotoninReceptor(DiffuseReceptor):
@@ -22,7 +23,7 @@ class AxonalSerotoninReceptor(DiffuseReceptor):
             self.level = level
             # Update threshold
             self.target.failureRate = self.unmodifiedFailureRate - (self.weight * self.level)
-            print("Modified target failure rate to "+str(self.target.failureRate))
+            logging.debug("Modified target failure rate to %s" % self.target.failureRate)
             # else:
             #     raise ValueError("Error: setSerotoninLevel requires an integer or floating point input")
 
