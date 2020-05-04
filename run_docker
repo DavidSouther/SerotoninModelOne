@@ -1,0 +1,2 @@
+docker build -t serotonin .
+docker run serotonin

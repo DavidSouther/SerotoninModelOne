@@ -1,0 +1,11 @@
+# Serotonin Model
+
+## Local run
+*   Use python3 3.6 or later
+*   `python -m venv .venv` uses './.venv' for the virtual environment, ignored by git
+    *   `source .venv/bin/activate` or `.\.venv\bin\activate`
+*   `pip install -r requirements.txt`
+
+## Docker run locally
+*   `run_docker`
+
