@@ -1,22 +1,42 @@
 import sys
-from absl import flags 
+from absl import flags
 from absl import logging
-from scipy import *
+from matplotlib.pyplot import figure
+from matplotlib.pyplot import colorbar
+from matplotlib.pyplot import pcolor 
+from matplotlib.pyplot import plot 
+from matplotlib.pyplot import savefig 
+from matplotlib.pyplot import subplot 
+from matplotlib.pyplot import title 
+from numpy import arange
+from numpy import zeros 
 from TwoColumnNetwork import *
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
+flags.DEFINE_integer("steps_between_timing_debug", 10,
+                     "Number of steps to log progress after")
+
 
 class TwoColumnSimulation():
     def __init__(self, params):
         self.params = params
         self.tau = self.params["tau"]  # In ms
         self.tspan1 = arange(0, self.params["maxTime"], self.tau)
-        self.tspan2 = arange(self.params["maxTime"], self.params["maxTime"]*2, self.tau)
-        self.tspan3 = arange(self.params["maxTime"]*2, self.params["maxTime"]*3, self.tau)
-        self.tspan4 = arange(self.params["maxTime"]*3, self.params["maxTime"]*4, self.tau)
-        self.network = TwoColumnNetwork(self.tau, self, self.params, "Test Network1")
+        self.tspan2 = arange(
+            self.params["maxTime"],
+            self.params["maxTime"] * 200,
+            self.tau)
+        self.tspan3 = arange(
+            self.params["maxTime"] * 2,
+            self.params["maxTime"] * 3,
+            self.tau)
+        self.tspan4 = arange(
+            self.params["maxTime"] * 3,
+            self.params["maxTime"] * 4,
+            self.tau)
+        self.network = TwoColumnNetwork(
+            self.tau, self, self.params, "Test Network1")
 
     def run(self):
         # First Portion, full input
@@ -26,7 +46,8 @@ class TwoColumnSimulation():
                 logging.debug("Phase 1 step: %d" % t)
             self.network.step()
 
-        self.aEndOfFirstPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+        self.aEndOfFirstPortionSpikes = [
+            len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
 
         # Second portion, sensory deprivation
         logging.info("Phase Two")
@@ -37,22 +58,26 @@ class TwoColumnSimulation():
                 logging.debug("Phase 2 step: %d" % t)
             self.network.step()
 
-        self.aEndOfSecondPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+        self.aEndOfSecondPortionSpikes = [
+            len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
 
         # Third portion, Serotonin and Plasticity
         logging.info("Phase Three")
-        weightMatrixPriorBA = zeros([self.params["popCount"], self.params["popCount"]])
+        weightMatrixPriorBA = zeros(
+            [self.params["popCount"], self.params["popCount"]])
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
-                        weightMatrixPriorBA[x,y] = source.postSynapticReceptors[0].weight
+                        weightMatrixPriorBA[x,
+                                            y] = source.postSynapticReceptors[0].weight
 
         figure()
         pcolor(weightMatrixPriorBA)
         colorbar()
         title('Prior Weights from Input B to Pyramidals A')
 
+        """
         # Increase 5HT
         transmittersA = {}
         transmittersA["5HT2A"] = 30
@@ -63,7 +88,6 @@ class TwoColumnSimulation():
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
-                    # print(source.target.name, sim.network.populations["pyramidalsA"].cells[y].name)
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
                         source.postSynapticReceptors[0].plasticity = True
                         source.postSynapticReceptors[0].c_p = 180.3
@@ -73,19 +97,23 @@ class TwoColumnSimulation():
                 logging.debug("Phase 3 step: %d" % t)
             self.network.step()
 
-        self.aEndOfThirdPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+        self.aEndOfThirdPortionSpikes = [
+            len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
 
-        weightMatrixPostBA = zeros([self.params["popCount"], self.params["popCount"]])
+        weightMatrixPostBA = zeros(
+            [self.params["popCount"], self.params["popCount"]])
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
-                        weightMatrixPostBA[x,y] = source.postSynapticReceptors[0].weight
+                        weightMatrixPostBA[x,
+                                           y] = source.postSynapticReceptors[0].weight
 
         figure()
         pcolor(weightMatrixPostBA)
         colorbar()
         title('Posterior Weights from Input B to Pyramidals A')
+        savefig('fig_01_phase_three_weights.png')
 
         # Fourth portion, remapped functionality.
         logging.info("Phase Four")
@@ -93,7 +121,6 @@ class TwoColumnSimulation():
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
-                    # print(source.target.name, sim.network.populations["pyramidalsA"].cells[y].name)
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
                         source.postSynapticReceptors[0].plasticity = False
 
@@ -106,34 +133,41 @@ class TwoColumnSimulation():
                 logging.debug("Phase 4 step: %d" % t)
             self.network.step()
 
-        # for t in self.tspan:
-        #     # if t % 10 == 0:
-        #     print("Time: ", t)
-        #     self.network.step()
-
-        self.aEndOfFourthPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+        self.aEndOfFourthPortionSpikes = [
+            len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+                                           """
 
     def plotColumns(self):
-        inputAVoltages = [c.vv for c in self.network.populations["InputA"].cells]
-        inputBVoltages = [c.vv for c in self.network.populations["InputB"].cells]
+        inputAVoltages = [
+            c.vv for c in self.network.populations["InputA"].cells]
+        inputBVoltages = [
+            c.vv for c in self.network.populations["InputB"].cells]
 
-        aPyramidalVoltages = [c.vv for c in self.network.populations["pyramidalsA"].cells]
-        aFSVoltages = [c.vv for c in self.network.populations["fastSpikingsA"].cells]
-        aLTSVoltages = [c.vv for c in self.network.populations["lowThresholdsA"].cells]
+        aPyramidalVoltages = [
+            c.vv for c in self.network.populations["pyramidalsA"].cells]
+        aFSVoltages = [
+            c.vv for c in self.network.populations["fastSpikingsA"].cells]
+        aLTSVoltages = [
+            c.vv for c in self.network.populations["lowThresholdsA"].cells]
 
-        bPyramidalVoltages = [c.vv for c in self.network.populations["pyramidalsB"].cells]
-        bFSVoltages = [c.vv for c in self.network.populations["fastSpikingsB"].cells]
-        bLTSVoltages = [c.vv for c in self.network.populations["lowThresholdsB"].cells]
+        bPyramidalVoltages = [
+            c.vv for c in self.network.populations["pyramidalsB"].cells]
+        bFSVoltages = [
+            c.vv for c in self.network.populations["fastSpikingsB"].cells]
+        bLTSVoltages = [
+            c.vv for c in self.network.populations["lowThresholdsB"].cells]
 
-        aPyramidalSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
-        bPyramidalSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsB"].cells]
+        aPyramidalSpikes = [len(c.spikeRecord)
+                            for c in self.network.populations["pyramidalsA"].cells]
+        bPyramidalSpikes = [len(c.spikeRecord)
+                            for c in self.network.populations["pyramidalsB"].cells]
 
         print("A Spikes: ", sum(aPyramidalSpikes))
         print("B Spikes: ", sum(bPyramidalSpikes))
 
         # Sliding Windowed Spike Rates
         figure()
-        subplot(4,1,1)
+        subplot(4, 1, 1)
         plot(self.network.populations["InputA"].rateRecord)
         title('A Input')
 
@@ -148,6 +182,7 @@ class TwoColumnSimulation():
         subplot(4, 1, 4)
         plot(self.network.populations["lowThresholdsA"].rateRecord)
         title('A LTS Cells')
+        savefig('fig_02_column_a_spike_rates.png')
 
         figure()
         subplot(4, 1, 1)
@@ -165,6 +200,8 @@ class TwoColumnSimulation():
         subplot(4, 1, 4)
         plot(self.network.populations["lowThresholdsB"].rateRecord)
         title('B LTS Cells')
+
+        savefig('fig_03_column_b_spike_rates.png')
 
         figure()
         # title("Column A")
@@ -191,6 +228,8 @@ class TwoColumnSimulation():
         colorbar()
         title('A LTS Cells')
 
+        savefig('fig_04_column_a_voltages.png')
+
         figure()
         subplot(4, 1, 1)
         pcolor(inputBVoltages, vmin=-100, vmax=60)
@@ -215,10 +254,11 @@ class TwoColumnSimulation():
         # plot(self.network.populations["lowThresholdsB"].rateRecord, color='White')
         colorbar()
         title('B LTS Cells')
+        savefig('fig_05_column_b_voltages.png')
 
         numax = len(self.network.populations["InputB"].outboundAxons)
         timeSpan = len(self.network.populations["InputB"].rateRecord)
-        baSpikeFailures = np.zeros((numax, timeSpan))
+        baSpikeFailures = zeros((numax, timeSpan))
         axNum = 0
         for ax in self.network.populations["InputB"].outboundAxons:
             baSpikeFailures[axNum, :] = ax.spikeFailures
@@ -226,8 +266,8 @@ class TwoColumnSimulation():
 
         figure()
         pcolor(baSpikeFailures, cmap="Greys")
+        savefig('fig_06_ba_spike_failures.png')
 
         figure()
         plot(sum(baSpikeFailures, axis=0))
-
-        savefig("fig1.png")
+        savefig('fig_07_ba_spike_failures_sum.png')
