@@ -100,6 +100,16 @@ class TwoColumnSimulation():
         self.phase3()
         self.phase4()
 
+    def savefig(self, name):
+        fig = self.nextFigure
+        self.nextFigure += 1
+        fullName = "fig_%s_%s" % (str(fig).zfill(2), name)
+        logging.info("Writing figure %s" % fullName)
+        savefig(fullName)
+        # TODO(davidsouther):
+        #     *   Generate a path name based on the run
+        #     *   Upload the written file to gs://serotonin
+
     def plotColumns(self):
         figure()
         pcolor(self.weightMatrixPriorBA)
@@ -112,6 +122,7 @@ class TwoColumnSimulation():
         colorbar()
         title('Posterior Weights from Input B to Pyramidals A')
         self.savefig('phase_three_posterior_weights.png')
+
         inputAVoltages = [c.vv for c in self.network.populations["InputA"].cells]
         inputBVoltages = [c.vv for c in self.network.populations["InputB"].cells]
 
@@ -122,12 +133,6 @@ class TwoColumnSimulation():
         bPyramidalVoltages = [c.vv for c in self.network.populations["pyramidalsB"].cells]
         bFSVoltages = [c.vv for c in self.network.populations["fastSpikingsB"].cells]
         bLTSVoltages = [c.vv for c in self.network.populations["lowThresholdsB"].cells]
-
-        aPyramidalSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
-        bPyramidalSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsB"].cells]
-
-        print("A Spikes: ", sum(aPyramidalSpikes))
-        print("B Spikes: ", sum(bPyramidalSpikes))
 
         # Sliding Windowed Spike Rates
         figure()
@@ -146,7 +151,7 @@ class TwoColumnSimulation():
         subplot(4, 1, 4)
         plot(self.network.populations["lowThresholdsA"].rateRecord)
         title('A LTS Cells')
-        savefig('fig_02_column_a_spike_rates.png')
+        self.savefig('column_a_spike_rates.png')
 
         figure()
         subplot(4, 1, 1)
@@ -165,10 +170,9 @@ class TwoColumnSimulation():
         plot(self.network.populations["lowThresholdsB"].rateRecord)
         title('B LTS Cells')
 
-        savefig('fig_03_column_b_spike_rates.png')
+        self.savefig('column_b_spike_rates.png')
 
         figure()
-        # title("Column A")
         subplot(4, 1, 1)
         pcolor(inputAVoltages, vmin=-100, vmax=60)
         colorbar()
@@ -176,49 +180,42 @@ class TwoColumnSimulation():
 
         subplot(4, 1, 2)
         pcolor(aPyramidalVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["pyramidalsA"].rateRecord, color='White')
         colorbar()
         title('A Pyramidal Cells')
 
         subplot(4, 1, 3)
         pcolor(aFSVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["fastSpikingsA"].rateRecord, color='White')
         colorbar()
         title('A FS Cells')
 
         subplot(4, 1, 4)
         pcolor(aLTSVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["lowThresholdsA"].rateRecord, color='White')
         colorbar()
         title('A LTS Cells')
 
-        savefig('fig_04_column_a_voltages.png')
+        self.savefig('column_a_voltages.png')
 
         figure()
         subplot(4, 1, 1)
         pcolor(inputBVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["InputB"].rateRecord, color='White')
         colorbar()
         title('B Input')
 
         subplot(4, 1, 2)
         pcolor(bPyramidalVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["pyramidalsB"].rateRecord, color='White')
         colorbar()
         title('B Pyramidal Cells')
 
         subplot(4, 1, 3)
         pcolor(bFSVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["fastSpikingsB"].rateRecord, color='White')
         colorbar()
         title('B FS Cells')
 
         subplot(4, 1, 4)
         pcolor(bLTSVoltages, vmin=-100, vmax=60)
-        # plot(self.network.populations["lowThresholdsB"].rateRecord, color='White')
         colorbar()
         title('B LTS Cells')
-        savefig('fig_05_column_b_voltages.png')
+        self.savefig('column_b_voltages.png')
 
         numax = len(self.network.populations["InputB"].outboundAxons)
         timeSpan = len(self.network.populations["InputB"].rateRecord)
@@ -230,8 +227,4 @@ class TwoColumnSimulation():
 
         figure()
         pcolor(baSpikeFailures, cmap="Greys")
-        savefig('fig_06_ba_spike_failures.png')
-
-        figure()
-        plot(sum(baSpikeFailures, axis=0))
-        savefig('fig_07_ba_spike_failures_sum.png')
+        self.savefig('ba_spike_failures.png')
