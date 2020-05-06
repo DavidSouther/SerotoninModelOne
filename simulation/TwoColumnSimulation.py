@@ -133,14 +133,14 @@ class TwoColumnSimulation():
         figure()
         pcolor(self.weightMatrixPriorBA)
         colorbar()
-        title('Prior Weights from Input B to Pyramidals A')
-        self.savefig('phase_three_anterior_weights.png')
+        title('Before Phase 3 Weights from Input B to Pyramidals A')
+        self.savefig('weights_before_phase_3.png')
 
         figure()
         pcolor(self.weightMatrixPostBA)
         colorbar()
-        title('Posterior Weights from Input B to Pyramidals A')
-        self.savefig('phase_three_posterior_weights.png')
+        title('After Phase 3 Weights from Input B to Pyramidals A')
+        self.savefig('weights_after_phase_3.png')
 
         inputAVoltages = [c.vv for c in self.network.populations["InputA"].cells]
         inputBVoltages = [c.vv for c in self.network.populations["InputB"].cells]
