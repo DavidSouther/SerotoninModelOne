@@ -1,9 +1,9 @@
 import logging as log
-from Population import *
-from PoissonPopulation import *
-from Network import *
-from AxonalSerotoninReceptorFactory import *
-from SomaticSerotoninReceptorFactory import *
+from model.Population import Population
+from model.PoissonPopulation import PoissonPopulation
+from model.Network import Network
+from model.AxonalSerotoninReceptorFactory import AxonalSerotoninDiffuseReceptorFactory
+from model.SomaticSerotoninReceptorFactory import SomaticSerotoninDiffuseReceptorFactory
 from random import random, gauss
 import functools
 

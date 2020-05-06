@@ -1,4 +1,4 @@
-from TwoColumnSimulationPharma import *
+from simulation.TwoColumnSimulationPharma import *
 # import winsound
 import dill
 from copy import deepcopy

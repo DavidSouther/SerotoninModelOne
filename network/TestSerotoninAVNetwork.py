@@ -1,4 +1,4 @@
-from Simulation import *
+from simulation.Simulation import *
 import winsound
 
 params = {}

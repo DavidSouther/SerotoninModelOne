@@ -1,4 +1,4 @@
-from TwoColumnSimulation import *
+from simulation.TwoColumnSimulation import *
 # import winsound
 import dill
 from copy import deepcopy
