@@ -26,13 +26,13 @@ PYA -> LTA
 
 PYB -> FSB
 FSB -> PYB
-PYB -> LTA
+PYB -> LTB
 
 LTA -> PYB
 LTA -> FSB
 
 LTB -> PYA
-LYB -> FSB
+LYB -> FSA
 """
 
 class TwoColumnNetwork(Network):
