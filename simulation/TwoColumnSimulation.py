@@ -15,6 +15,7 @@ from network.TwoColumnNetwork import TwoColumnNetwork
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
 flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
 
 class TwoColumnSimulation():
