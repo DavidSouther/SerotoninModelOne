@@ -1,3 +1,4 @@
+import os
 import sys
 from absl import flags 
 from absl import logging
@@ -15,6 +16,7 @@ from network.TwoColumnNetwork import TwoColumnNetwork
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_string("figures_directory", "figures", "Directory relative to the running directory to save figures.")
 flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
 flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
 
@@ -23,6 +25,7 @@ class TwoColumnSimulation():
         self.params = params
         self.tau = params["tau"]
         self.network = TwoColumnNetwork(self.tau, self, self.params, "Test Network1")
+        self.figures_directory = os.path.join(os.curdir, FLAGS.figures_directory)
 
     def runPhase(self, phase):
         maxTime = self.params["maxTime"]
@@ -100,17 +103,28 @@ class TwoColumnSimulation():
         self.phase3()
         self.phase4()
 
-    def savefig(self, name):
+    def getFigureName(self, name):
         fig = self.nextFigure
         self.nextFigure += 1
         fullName = "fig_%s_%s" % (str(fig).zfill(2), name)
+        return fullName
+
+    def savefig(self, name):
+        fullName = self.getFigureName(name)
         logging.info("Writing figure %s" % fullName)
-        savefig(fullName)
+        path = os.path.join(self.figures_directory, fullName)
+        savefig(path)
         # TODO(davidsouther):
         #     *   Generate a path name based on the run
         #     *   Upload the written file to gs://serotonin
 
+    def prepareOutput(self):
+        if not os.path.exists(self.figures_directory):
+            os.makedirs(self.figures_directory)
+
     def plotColumns(self):
+        self.prepareOutput()
+
         figure()
         pcolor(self.weightMatrixPriorBA)
         colorbar()
