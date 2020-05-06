@@ -1,4 +1,6 @@
 from random import gauss
+from absl import flags 
+from absl import logging
 from pylab import *
 from scipy import *
 from numpy import *
@@ -10,6 +12,10 @@ M-current enabled variant on the Izhikevich quadratic integrate-and-fire neuron
 
 @author: stefan
 '''
+
+FLAGS = flags.FLAGS
+
+flags.DEFINE_bool("trace_neuron_history", False, "When true, trace history at every state.")
 
 class Neuron:
     def __init__(self, tau, parameters, name, inputs=None, outputs=None, diffuseTransmitters = None, externalInput = 0.0, parentPopulation=None, debug=False):
@@ -179,8 +185,8 @@ class Neuron:
         self.time += self.tau
         # self.synapticInput = self.g_AMPA + self.g_NMDA - self.g_GABA
         self.I = self.externalInput + self.synapticInput + self.diffuseCurrent
-        # print(self.name, ":", self.synapticInput, "/", self.I)
-        self.ii.append(self.I)
+
+        logging.debug("%s: %f/%f" % (self.name, self.synapticInput, self.I))
 
         # # Euler
         # # self.v = self.v + self.tau*(self.k*(self.v-self.v_r)*(self.v-self.v_t)-self.u+self.I)/self.C
@@ -205,19 +211,25 @@ class Neuron:
         self.u = self.u + du
 
         self.vv.append(self.v)
-        self.bb.append(self.b)
-        self.uu.append(self.u)
+        if FLAGS.trace_neuron_history:
+            self.ii.append(self.I)
+            self.bb.append(self.b)
+            self.uu.append(self.u)
 
         if self.v > self.v_peak: # Spike
             self.spikeRecord.append(self.time)
+
             for receptor in self.postSynapticReceptors:
                 receptor.postSynapticSpikeFeedback()
-            self.v = self.c
-            self.u = self.u + self.d
-            if self.debug:
-                print("SPIKE!")
+                
+            self.v=self.c
+            self.u=self.u + self.d
+ 
+            logging.debug("Spike on Neuron %s" % self.name)
+
             for axon in self.outputs:
                 axon.enqueue()
+
         if self.u > 500:
             self.u = 500
 

@@ -1,4 +1,4 @@
-import logging as log
+from absl import logging
 from model.AxonalSerotoninReceptorFactory import AxonalSerotoninDiffuseReceptorFactory
 from model.PoissonPopulation import PoissonPopulation 
 from model.Population import Population
@@ -7,7 +7,33 @@ from network.Network import Network
 from random import random, gauss
 import functools
 
-# TODO: change imports to a "import <file>" format, then call them with <file>.<class>
+"""
+Build two columns of input, pyramidal, fast spiking, and low threshold neurons with apporpriate interconnections.
+
+INA -> PYA
+INB -> PYB
+INA -> PYB
+INB -> PYA
+
+PYA -> PYA
+PYA -> PYA
+PYB -> PYB
+PYB -> PYB
+
+PYA -> FSA
+FSA -> FSA
+PYA -> LTA
+
+PYB -> FSB
+FSB -> PYB
+PYB -> LTB
+
+LTA -> PYB
+LTA -> FSB
+
+LTB -> PYA
+LYB -> FSA
+"""
 
 class TwoColumnNetwork(Network):
     def __init__(self, tau, parentSimulation, params, name):

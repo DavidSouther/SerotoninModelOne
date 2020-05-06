@@ -1,8 +1,8 @@
 from __future__ import division
+from absl import logging
 from model.InjectedCurrentReceptor import InjectedCurrentReceptor
 from model.GlutGSDReceptor import GlutGSDReceptor
 from model.GABAGSDReceptor import GABAGSDReceptor
-import logging as log
 from random import random
 
 '''
@@ -56,8 +56,7 @@ class Axon():
         self.proximalDiffuseTransmitterLevels = {}
         self.distalDiffuseTransmitterLevels = {}
 
-        if self.debug:
-            print(self.source.type, "connected to ", self.target.type)
+        logging.debug("%s connected to %s" % ( self.source.type, self.target.type))
 
     def addProximalDiffuseAxonReceptor(self, receptor):
         self.proximalDiffuseReceptors.append(receptor)
@@ -71,7 +70,9 @@ class Axon():
             try:
                 proximalAxonReceptor.setLevel(self.proximalDiffuseTransmitterLevels[proximalAxonReceptor.getTypeString()]) # Set the level to be whatever matches it in the passed dictionary
             except KeyError:
-                log.warning("WARNING: There are proximal receptors of type " + proximalAxonReceptor.getTypeString() + " in axons originating in population " + self.source.parentPopulation.name + ", which does not currently have any transmitter levels set for that name.  Defaulting to a level of 0.0")
+                logging.warning(
+                    "There are proximal receptors of type %s in axons originating in population %s, which does not currently have any transmitter levels set for that name.  Defaulting to a level of 0.0" %
+                    (proximalAxonReceptor.getTypeString(), self.source.parentPopulation.name))
                 proximalAxonReceptor.setLevel(0.0)
         return
 
@@ -81,15 +82,16 @@ class Axon():
             try:
                 distalAxonReceptor.setLevel(self.distalDiffuseTransmitterLevels[distalAxonReceptor.getTypeString()]) # Set the level to be whatever matches it in the passed dictionary
             except KeyError:
-                log.warning("WARNING: There are distal receptors of type " + distalAxonReceptor.getTypeString() + " in axons going to population " + self.target.parentPopulation.name + " from " + self.source.parentPopulation.name + ", which does not currently have any transmitter levels set for that name.  Defaulting to a level of 0.0")
+                logging.warning("WARNING: There are distal receptors of type %s in axons going to population %s from %s, which does not currently have any transmitter levels set for that name.  Defaulting to a level of 0.0" % (distalAxonReceptor.getTypeString(), self.target.parentPopulation.name, self.source.parentPopulation.name))
                 distalAxonReceptor.setLevel(0.0)
         return
 
     def enqueue(self):
         if random() > self.failureRate:
             self.justFailed = -1
-            if self.debug:
-                print(self.source.type, "spiked!  Transmitting ", self.weight, "to ", self.target.type)
+            logging.debug(
+                "%s spiked! Transmitting %f to %s" %
+                (self.source.type, self.weight, self.target.type))
             if self.fastMode:   # If we are not doing timed myelinated transmission, just directly inject current into the target
                 self.boutonSpike()
             else:

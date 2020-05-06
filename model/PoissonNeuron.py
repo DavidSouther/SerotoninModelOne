@@ -14,6 +14,7 @@ class PoissonNeuron(Neuron):
         self.tau = tau
         self.time = 0
         self.parentPopulation = parentPop
+        self.type = "PoissonNeuron"
 
         # Set up outputs
         if outputs is None:

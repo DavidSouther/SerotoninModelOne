@@ -1,4 +1,7 @@
+.git
 .venv
 __pycache__
 *.jar
 .idea
+*.png
+*.pickle
