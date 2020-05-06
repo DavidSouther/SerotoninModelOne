@@ -21,47 +21,39 @@ flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log p
 class TwoColumnSimulation():
     def __init__(self, params):
         self.params = params
-        self.tau = self.params["tau"]  # In ms
-        self.tspan1 = arange(0, self.params["maxTime"], self.tau)
-        self.tspan2 = arange(self.params["maxTime"], self.params["maxTime"]*2, self.tau)
-        self.tspan3 = arange(self.params["maxTime"]*2, self.params["maxTime"]*3, self.tau)
-        self.tspan4 = arange(self.params["maxTime"]*3, self.params["maxTime"]*4, self.tau)
+        self.tau = params["tau"]
         self.network = TwoColumnNetwork(self.tau, self, self.params, "Test Network1")
 
-    def run(self):
-        # First Portion, full input
-        logging.info("Phase One")
-        for t in self.tspan1:
+    def runPhase(self, phase):
+        maxTime = self.params["maxTime"]
+        tau = self.tau
+        start = maxTime * (phase - 1)
+        end = maxTime * phase
+        tspan = arange(start, end, tau)
+        for t in tspan:
             if t % FLAGS.steps_between_timing_debug == 0:
                 logging.debug("Phase 1 step: %d" % t)
             self.network.step()
 
-        self.aEndOfFirstPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+    def phase1(self):
+        logging.info("Phase One, full input")
+        self.runPhase(1)
 
-        # Second portion, sensory deprivation
-        logging.info("Phase Two")
+    def phase2(self):
+        logging.info("Phase Two, sensory deprivation")
         for inputCell in self.network.populations["InputA"].cells:
             inputCell.poissonLambda = 0
-        for t in self.tspan2:
-            if t % FLAGS.steps_between_timing_debug == 0:
-                logging.debug("Phase 2 step: %d" % t)
-            self.network.step()
+        self.runPhase(2)
 
-        self.aEndOfSecondPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
-
-        # Third portion, Serotonin and Plasticity
-        logging.info("Phase Three")
-        weightMatrixPriorBA = zeros([self.params["popCount"], self.params["popCount"]])
+    def phase3(self):
+        # Third portion
+        logging.info("Phase Three, Serotonin and Plasticity")
+        self.weightMatrixPriorBA = zeros([self.params["popCount"], self.params["popCount"]])
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
                         weightMatrixPriorBA[x,y] = source.postSynapticReceptors[0].weight
-
-        figure()
-        pcolor(weightMatrixPriorBA)
-        colorbar()
-        title('Prior Weights from Input B to Pyramidals A')
 
         # Increase 5HT
         transmittersA = {}
@@ -77,28 +69,17 @@ class TwoColumnSimulation():
                         source.postSynapticReceptors[0].plasticity = True
                         source.postSynapticReceptors[0].c_p = 180.3
 
-        for t in self.tspan3:
-            if t % FLAGS.steps_between_timing_debug == 0:
-                logging.debug("Phase 3 step: %d" % t)
-            self.network.step()
+        self.runPhase(3)
 
-        self.aEndOfThirdPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
-
-        weightMatrixPostBA = zeros([self.params["popCount"], self.params["popCount"]])
+        self.weightMatrixPostBA = zeros([self.params["popCount"], self.params["popCount"]])
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
                         weightMatrixPostBA[x,y] = source.postSynapticReceptors[0].weight
 
-        figure()
-        pcolor(weightMatrixPostBA)
-        colorbar()
-        title('Posterior Weights from Input B to Pyramidals A')
-        savefig('fig_01_phase_three_weights.png')
-
-        # Fourth portion, remapped functionality.
-        logging.info("Phase Four")
+    def phase4(self):
+        logging.info("Phase Four, remapped functionality.")
         # Turn off plasticity
         for x in range(len(self.network.populations["InputB"].cells)):
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
@@ -110,19 +91,27 @@ class TwoColumnSimulation():
         transmittersA["5HT2A"] = 40
         transmittersA["5HT1A"] = 40
         self.network.setSerotoninA(transmittersA)
-        for t in self.tspan4:
-            if t % FLAGS.steps_between_timing_debug == 0:
-                logging.debug("Phase 4 step: %d" % t)
-            self.network.step()
+        self.runPhase(4)
 
-        # for t in self.tspan:
-        #     # if t % 10 == 0:
-        #     print("Time: ", t)
-        #     self.network.step()
-
-        self.aEndOfFourthPortionSpikes = [len(c.spikeRecord) for c in self.network.populations["pyramidalsA"].cells]
+    def run(self):
+        self.nextFigure = 1
+        self.phase1()
+        self.phase2()
+        self.phase3()
+        self.phase4()
 
     def plotColumns(self):
+        figure()
+        pcolor(self.weightMatrixPriorBA)
+        colorbar()
+        title('Prior Weights from Input B to Pyramidals A')
+        self.savefig('phase_three_anterior_weights.png')
+
+        figure()
+        pcolor(self.weightMatrixPostBA)
+        colorbar()
+        title('Posterior Weights from Input B to Pyramidals A')
+        self.savefig('phase_three_posterior_weights.png')
         inputAVoltages = [c.vv for c in self.network.populations["InputA"].cells]
         inputBVoltages = [c.vv for c in self.network.populations["InputB"].cells]
 
