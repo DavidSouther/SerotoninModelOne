@@ -53,7 +53,7 @@ class TwoColumnSimulation():
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
-                        weightMatrixPriorBA[x,y] = source.postSynapticReceptors[0].weight
+                        self.weightMatrixPriorBA[x,y] = source.postSynapticReceptors[0].weight
 
         # Increase 5HT
         transmittersA = {}
@@ -76,7 +76,7 @@ class TwoColumnSimulation():
             for y in range(len(self.network.populations["pyramidalsA"].cells)):
                 for source in self.network.populations["InputB"].cells[x].outputs:
                     if source.target == self.network.populations["pyramidalsA"].cells[y]:
-                        weightMatrixPostBA[x,y] = source.postSynapticReceptors[0].weight
+                        self.weightMatrixPostBA[x,y] = source.postSynapticReceptors[0].weight
 
     def phase4(self):
         logging.info("Phase Four, remapped functionality.")
