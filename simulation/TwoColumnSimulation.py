@@ -16,7 +16,13 @@ from network.TwoColumnNetwork import TwoColumnNetwork
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("figures_directory", "figures", "Directory relative to the running directory to save figures.")
+def get_default_figures_directory():
+    try:
+        return os.environ["FIGURES_DIRECTORY"]
+    except:
+        return os.path.join(os.curdir, "figures")
+
+flags.DEFINE_string("figures_directory", get_default_figures_directory(), "Directory relative to the running directory to save figures.")
 flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
 flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
 
@@ -25,7 +31,6 @@ class TwoColumnSimulation():
         self.params = params
         self.tau = params["tau"]
         self.network = TwoColumnNetwork(self.tau, self, self.params, "Test Network1")
-        self.figures_directory = os.path.join(os.curdir, FLAGS.figures_directory)
 
     def runPhase(self, phase):
         maxTime = self.params["maxTime"]
@@ -111,16 +116,16 @@ class TwoColumnSimulation():
 
     def savefig(self, name):
         fullName = self.getFigureName(name)
-        logging.info("Writing figure %s" % fullName)
-        path = os.path.join(self.figures_directory, fullName)
+        path = os.path.join(FLAGS.figures_directory, fullName)
+        logging.info("Writing figure to %s" % path)
         savefig(path)
         # TODO(davidsouther):
         #     *   Generate a path name based on the run
         #     *   Upload the written file to gs://serotonin
 
     def prepareOutput(self):
-        if not os.path.exists(self.figures_directory):
-            os.makedirs(self.figures_directory)
+        if not os.path.exists(FLAGS.figures_directory):
+            os.makedirs(FLAGS.figures_directory)
 
     def plotColumns(self):
         self.prepareOutput()
