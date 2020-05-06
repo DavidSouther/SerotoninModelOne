@@ -11,4 +11,4 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 ADD . .
 
-CMD [ "python3", "./TestTwoColumnNetwork.py", "--mode=PLOT" ]
+CMD [ "python3", "./app.py", "--mode=PLOT" ]
