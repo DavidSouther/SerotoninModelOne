@@ -1,4 +1,4 @@
-from EINetwork import *
+from network.EINetwork import *
 from scipy import *
 
 class SimulationEI():

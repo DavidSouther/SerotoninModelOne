@@ -1,4 +1,4 @@
-from SerotoninAVNetwork import *
+from network.SerotoninAVNetwork import *
 from scipy import *
 
 class Simulation():
