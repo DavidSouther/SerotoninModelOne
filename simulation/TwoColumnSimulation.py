@@ -23,7 +23,6 @@ def get_default_figures_directory():
         return os.path.join(os.curdir, "figures")
 
 flags.DEFINE_string("figures_directory", get_default_figures_directory(), "Directory relative to the running directory to save figures.")
-flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
 flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
 
 class TwoColumnSimulation():

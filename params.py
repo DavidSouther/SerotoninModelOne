@@ -1,22 +1,43 @@
-import dill
-from absl import app
+import os
+
 from absl import flags
-from absl import logging
-from copy import deepcopy
-
-from simulation.TwoColumnSimulation import TwoColumnSimulation
-
 
 FLAGS = flags.FLAGS
+
+flags.DEFINE_integer("max_time", 100, "Number of miliseconds per phase.")
+flags.DEFINE_float("tau", 0.1, "Milisecond subdivision resolution.")
+flags.DEFINE_integer("population_count", 20, "Number of neurons per population")
+
+# Because this will often run in Docker, we can either set parameters using the environment, or using flags.
+# Because of the number of parameter flags, it's expected that a --flagfile would be used. This can be
+# generated programmatically across a number of criteria.
+
+def get_max_time():
+    try:
+        return os.environ["MAX_TIME"]
+    except:
+        return FLAGS.max_time
+
+def get_tau():
+    try:
+        return os.environ["TAU"]
+    except:
+        return FLAGS.tau
+
+def get_pop_count():
+    try:
+        return os.environ["POPULATION_COUNT"]
+    except:
+        return FLAGS.population_count
 
 def loadParams():
     params = {}
     # Time Parameters
-    params["maxTime"] = 100 #1000
-    params["tau"] = 0.1
+    params["maxTime"] = get_max_time()
+    params["tau"] = get_tau()
 
     # Population and Connection Parameters
-    params["popCount"] = 20
+    params["popCount"] = get_pop_count()
 
     params["pyramidalSelfExcitationWeight"] = 25
     params["pyramidalToPyramidalWeight"] = 50
@@ -48,27 +69,3 @@ def loadParams():
     params["Axonal5HT1AWeight"] = -0.4
 
     return params
-
-def runSim():
-    logging.info("Running a new TwoColumnSimulation pass")
-    params = loadParams()
-    sim = TwoColumnSimulation(params)
-
-    sim.run()
-
-    return sim
-
-def writeSim(sim):
-    with open(FLAGS.picklejar, "wb") as pickleJar:
-        logging.info("Writing a TwoColumnSimulation pass to %s" % FLAGS.picklejar)
-        dill.dump(deepcopy(sim), pickleJar)
-
-def readSim():
-    with open(FLAGS.picklejar, "rb") as pickleJar:
-        logging.info("Reading a TwoColumnSimulation pass from %s" % FLAGS.picklejar)
-        sim = dill.load(pickleJar)
-        return sim
-
-def plotSim(sim):
-    logging.info("Generating plots for TwoColumnSimulation")
-    sim.plotColumns()
