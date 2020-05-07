@@ -14,19 +14,19 @@ flags.DEFINE_integer("population_count", 20, "Number of neurons per population")
 
 def get_max_time():
     try:
-        return os.environ["MAX_TIME"]
+        return int(os.environ["MAX_TIME"])
     except:
         return FLAGS.max_time
 
 def get_tau():
     try:
-        return os.environ["TAU"]
+        return float(os.environ["TAU"])
     except:
         return FLAGS.tau
 
 def get_pop_count():
     try:
-        return os.environ["POPULATION_COUNT"]
+        return int(os.environ["POPULATION_COUNT"])
     except:
         return FLAGS.population_count
 
