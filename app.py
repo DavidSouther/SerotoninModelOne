@@ -8,6 +8,7 @@ from absl import logging
 from copy import deepcopy
 from params import loadParams
 from simulation.TwoColumnSimulation import TwoColumnSimulation
+from simulation.TwoColumnSimulation import TwoColumnSimulationPlotter
 
 
 sys.setrecursionlimit(10000)
@@ -40,7 +41,7 @@ def readSim():
 
 def plotSim(sim):
     logging.info("Generating plots for TwoColumnSimulation")
-    sim.plotColumns()
+    TwoColumnSimulationPlotter(sim).plotColumns()
 
 def main(argv):
     if FLAGS.mode == "PLOT":

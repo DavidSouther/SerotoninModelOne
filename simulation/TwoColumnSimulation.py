@@ -2,6 +2,7 @@ import os
 import sys
 from absl import flags 
 from absl import logging
+from datetime import datetime
 from matplotlib.pyplot import colorbar 
 from matplotlib.pyplot import figure
 from matplotlib.pyplot import pcolor 
@@ -22,8 +23,16 @@ def get_default_figures_directory():
     except:
         return os.path.join(os.curdir, "figures")
 
+def get_build_id():
+    try:
+        return os.environ["BUILD_ID"]
+    except:
+        return FLAGS.build_id
+
 flags.DEFINE_string("figures_directory", get_default_figures_directory(), "Directory relative to the running directory to save figures.")
 flags.DEFINE_integer("steps_between_timing_debug", 10, "Number of steps to log progress after")
+flags.DEFINE_string("build_id", "unknown_build", "Hash or unique ID of the running BUILD for ")
+
 
 class TwoColumnSimulation():
     def __init__(self, params):
@@ -101,11 +110,20 @@ class TwoColumnSimulation():
         self.runPhase(4)
 
     def run(self):
-        self.nextFigure = 1
         self.phase1()
         self.phase2()
         self.phase3()
         self.phase4()
+
+
+class TwoColumnSimulationPlotter():
+    def __init__(self, twoColumnSimulation):
+        self.twoColumnSimulation = twoColumnSimulation
+        self.network = twoColumnSimulation.network
+        self.initialization_time = datetime.utcnow().isoformat() 
+        self.figures_directory = os.path.join(FLAGS.figures_directory, get_build_id(), self.initialization_time)
+        if not os.path.exists(self.figures_directory):
+            os.makedirs(self.figures_directory)
 
     def getFigureName(self, name):
         fig = self.nextFigure
@@ -115,31 +133,27 @@ class TwoColumnSimulation():
 
     def savefig(self, name):
         fullName = self.getFigureName(name)
-        path = os.path.join(FLAGS.figures_directory, fullName)
+        path = os.path.join(self.figures_directory, fullName)
         logging.info("Writing figure to %s" % path)
         savefig(path)
         # TODO(davidsouther):
         #     *   Generate a path name based on the run
         #     *   Upload the written file to gs://serotonin
 
-    def prepareOutput(self):
-        if not os.path.exists(FLAGS.figures_directory):
-            os.makedirs(FLAGS.figures_directory)
-
     def plotColumns(self):
-        self.prepareOutput()
+        self.nextFigure = 1
 
         figure()
-        pcolor(self.weightMatrixPriorBA)
+        pcolor(self.twoColumnSimulation.weightMatrixPriorBA)
         colorbar()
-        title('Before Phase 3 Weights from Input B to Pyramidals A')
-        self.savefig('weights_before_phase_3.png')
+        title('Prior Weights from Input B to Pyramidals A')
+        self.savefig('phase_three_anterior_weights.png')
 
         figure()
-        pcolor(self.weightMatrixPostBA)
+        pcolor(self.twoColumnSimulation.weightMatrixPostBA)
         colorbar()
-        title('After Phase 3 Weights from Input B to Pyramidals A')
-        self.savefig('weights_after_phase_3.png')
+        title('Posterior Weights from Input B to Pyramidals A')
+        self.savefig('phase_three_posterior_weights.png')
 
         inputAVoltages = [c.vv for c in self.network.populations["InputA"].cells]
         inputBVoltages = [c.vv for c in self.network.populations["InputB"].cells]
