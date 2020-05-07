@@ -12,6 +12,8 @@ from matplotlib.pyplot import subplot
 from matplotlib.pyplot import title 
 from numpy import arange
 from numpy import zeros
+from numpy.random import seed as init_numpy 
+from random import seed as init_random
 
 from network.TwoColumnNetwork import TwoColumnNetwork
 
@@ -36,6 +38,9 @@ flags.DEFINE_string("build_id", "unknown_build", "Hash or unique ID of the runni
 
 class TwoColumnSimulation():
     def __init__(self, params):
+        seed = hash(get_build_id()) & 0xffffffff
+        init_numpy(seed)
+        init_random(seed)
         self.params = params
         self.tau = params["tau"]
         self.network = TwoColumnNetwork(self.tau, self, self.params, "Test Network1")
