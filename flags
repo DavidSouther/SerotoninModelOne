@@ -1,0 +1,42 @@
+# Time Parameters
+#--phaseLength=1000
+#--phase1Length=1
+#--phase2Length=1
+#--phase3Length=2
+#--phase4Length=2
+--maxTime=1000
+--tau=0.1
+
+# Population and Connection Parameters
+--popCount=20
+
+--pyramidalSelfExcitationWeight=25
+--pyramidalToPyramidalWeight=50
+--pyramidalToPyramidalLikelihood=0.3
+--PyramidalsToFSWeight=35
+--FSToPyramidalsWeight=-100
+--PyramidalsToLTSWeight=20
+--LTStoFSWeight=-50
+--LTStoPyramidalsWeight=-50
+--inputWeightA=50
+--inputWeightB=50
+--rateA=1
+--rateB=1
+--inputWeightAB=25
+--crossModalABLikelihood=0.5
+--inputWeightBA=25
+--crossModalBALikelihood=0.5 
+#--BaselineAxonalFailureRate=0.25 
+
+# Diffuse Neurotransmitter Paramters
+--serotoninLevelA=10
+--serotoninLevelB=10
+--Somatic5HT2AWeight=85
+--Somatic5HT2AWeightLTS=81
+--Somatic5HT1AWeight=-80
+--Axonal5HT2AWeight=0.4
+--Axonal5HT1AWeight=-0.4
+#--Baseline_AreaA_5HT2A=10
+#--Baseline_AreaA_5HT1A=10
+#--Deprivation_AreaA_5HT2A=40
+#--Deprivation_AreaA_5HT1A=40
