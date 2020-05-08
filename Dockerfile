@@ -18,4 +18,4 @@ ENV FIGURES_DIRECTORY=/usr/lib/serotonin/figures
 # ./flags is a flags file with the values to use for this run. There is a default flags
 # file in the repository, but it is overwritten with run-specific values during a
 # continuous deployment run.
-CMD [ "python3", "./app.py", "--mode=PLOT", "--flags=flags"]
+CMD [ "python3", "./app.py", "--mode=PLOT", "--flagfile=flagfile"]

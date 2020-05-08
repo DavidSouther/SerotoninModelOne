@@ -1,0 +1,35 @@
+# Outputs
+--build_id=${build_id}
+
+# Time Parameters
+--maxTime=${maxTime}
+--tau=${tau}
+
+# Population and Connection Parameters
+--popCount=${popCount}
+
+--pyramidalSelfExcitationWeight=${pyramidalSelfExcitationWeight}
+--pyramidalToPyramidalWeight=${pyramidalToPyramidalWeight}
+--pyramidalToPyramidalLikelihood=${pyramidalToPyramidalLikelihood}
+--PyramidalsToFSWeight=${PyramidalsToFSWeight}
+--FSToPyramidalsWeight=${FSToPyramidalsWeight}
+--PyramidalsToLTSWeight=${PyramidalsToLTSWeight}
+--LTStoFSWeight=${LTStoFSWeight}
+--LTStoPyramidalsWeight=${LTStoPyramidalsWeight}
+--inputWeightA=${inputWeightA}
+--inputWeightB=${inputWeightB}
+--rateA=${rateA}
+--rateB=${rateB}
+--inputWeightAB=${inputWeightAB}
+--crossModalABLikelihood=${crossModalABLikelihood}
+--inputWeightBA=${inputWeightBA}
+--crossModalBALikelihood=${crossModalBALikelihood}
+
+# Diffuse Neurotransmitter Paramters
+--serotoninLevelA=${serotoninLevelA}
+--serotoninLevelB=${serotoninLevelB}
+--Somatic5HT2AWeight=${Somatic5HT2AWeight}
+--Somatic5HT2AWeightLTS=${Somatic5HT2AWeightLTS}
+--Somatic5HT1AWeight=${Somatic5HT1AWeight}
+--Axonal5HT2AWeight=${Axonal5HT2AWeight}
+--Axonal5HT1AWeight=${Axonal5HT1AWeight}
