@@ -36,13 +36,14 @@ def build_table_matrix(ranges, accumulated = {}):
             next_ranges = {**ranges}
             del next_ranges[key]
             yield from build_table_matrix(next_ranges, accumulated=next_accumulated)
+        return
 
 
 def write_template(template, build_id, default_params, matrix_params):
     params = {
         **default_params,
         **matrix_params,
-        } # Merge param dictionaries
+    } # Merge param dictionaries
 
     params["build_id"] = build_id
 
@@ -55,6 +56,13 @@ def write_template(template, build_id, default_params, matrix_params):
     except Exception as err:
         logging.warn("Failed to write template for %s" % build_id)
         logging.info(err)
+
+
+def encode_params(matrix_params):
+    encoded_params = ''
+    for key in matrix_params:
+        encoded_params = "%s__%s_%s" % (encoded_params, key, matrix_params[key])
+    return encoded_params[2:] # Strip leading __
 
 
 def main(argv):
@@ -71,9 +79,10 @@ def main(argv):
         "popCount": range(10, 50, 10),
     }
 
-    for matrix_params in build_table_matrix(ranges):
-        encoded_params = str(matrix_params).encode("ascii")
-        build_id = str(b64encode(encoded_params)).replace("'", "")[1:]
+    params_comb = [matrix_params for matrix_params in build_table_matrix(ranges)]
+
+    for matrix_params in params_comb:
+        build_id = encode_params(matrix_params)
         write_template(template, build_id, default_params, matrix_params)
 
 
