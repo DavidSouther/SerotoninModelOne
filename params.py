@@ -72,6 +72,4 @@ def loadParams():
     params["Axonal5HT2AWeight"] = FLAGS.Axonal5HT2AWeight
     params["Axonal5HT1AWeight"] = FLAGS.Axonal5HT1AWeight
 
-    print(params)
-
     return params
