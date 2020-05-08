@@ -14,4 +14,8 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 # default values, and run in PLOT mode.
 ADD . .
 ENV FIGURES_DIRECTORY=/usr/lib/serotonin/figures
-CMD [ "python3", "./app.py", "--mode=PLOT" ]
+
+# ./flags is a flags file with the values to use for this run. There is a default flags
+# file in the repository, but it is overwritten with run-specific values during a
+# continuous deployment run.
+CMD [ "python3", "./app.py", "--mode=PLOT", "--flags=flags"]

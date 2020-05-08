@@ -1,8 +1,13 @@
-from absl import app
-from absl import flags
+import dill
+import os
 import sys
 
-from network import TestTwoColumnNetwork 
+from absl import app
+from absl import flags
+from absl import logging 
+from copy import deepcopy
+from params import loadParams
+from simulation.TwoColumnSimulation import TwoColumnSimulation
 
 
 sys.setrecursionlimit(10000)
@@ -11,16 +16,42 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string("mode", "PLOT", "Mode to execute. PLOT to run and plot an output, wihout saving an intermediate simulation. RUN for running the simulation & saving a pickled output, WRITE to read a pickled output and generate figures.")
 
+flags.DEFINE_string("picklejar", "two_column_simulation.pickle", "Filename to write simulation to or read simulation from.")
+
+def runSim():
+    logging.info("Running a new TwoColumnSimulation pass")
+    params = loadParams()
+    sim = TwoColumnSimulation(params)
+
+    sim.run()
+
+    return sim
+
+def writeSim(sim):
+    with open(FLAGS.picklejar, "wb") as pickleJar:
+        logging.info("Writing a TwoColumnSimulation pass to %s" % FLAGS.picklejar)
+        dill.dump(deepcopy(sim), pickleJar)
+
+def readSim():
+    with open(FLAGS.picklejar, "rb") as pickleJar:
+        logging.info("Reading a TwoColumnSimulation pass from %s" % FLAGS.picklejar)
+        sim = dill.load(pickleJar)
+        return sim
+
+def plotSim(sim):
+    logging.info("Generating plots for TwoColumnSimulation")
+    sim.plotColumns()
+
 def main(argv):
     if FLAGS.mode == "PLOT":
-        sim = TestTwoColumnNetwork.runSim()
-        TestTwoColumnNetwork.plotSim(sim)
+        sim = runSim()
+        plotSim(sim)
     if FLAGS.mode == "RUN":
-        sim = TestTwoColumnNetwork.runSim()
-        TestTwoColumnNetwork.writeSim(sim)
+        sim = runSim()
+        writeSim(sim)
     if FLAGS.mode == "WRITE":
-        sim = TestTwoColumnNetwork.readSim()
-        TestTwoColumnNetwork.plotSim(sim)
+        sim = readSim()
+        plotSim(sim)
 
 if __name__ == '__main__':
     app.run(main)
