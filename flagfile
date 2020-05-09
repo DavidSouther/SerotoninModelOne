@@ -7,7 +7,7 @@
 #--phase2Length=1
 #--phase3Length=2
 #--phase4Length=2
---maxTime=1000
+--maxTime=10
 --tau=0.1
 
 # Population and Connection Parameters

@@ -79,9 +79,7 @@ def main(argv):
         "popCount": range(10, 50, 10),
     }
 
-    params_comb = [matrix_params for matrix_params in build_table_matrix(ranges)]
-
-    for matrix_params in params_comb:
+    for matrix_params in build_table_matrix(ranges):
         build_id = encode_params(matrix_params)
         write_template(template, build_id, default_params, matrix_params)
 

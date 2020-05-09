@@ -1,7 +1,10 @@
 .git
 .venv
+google-cloud-sdk
+figures
 __pycache__
 *.jar
 .idea
 *.png
 *.pickle
+envfile
