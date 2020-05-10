@@ -1,2 +1,2 @@
 docker build -t serotonin .
-docker run serotonin
+docker run --env-file=./envfile serotonin

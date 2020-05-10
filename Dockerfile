@@ -1,6 +1,5 @@
-# Use a ubuntu base image and install the most up-to-date python
-FROM ubuntu:20.04
-RUN apt-get update && apt-get install --no-install-recommends --yes python3 python3-pip
+# Use a google cloud sdk base image which has gsutil and python3
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 
 WORKDIR /usr/lib/serotonin
 
@@ -11,11 +10,8 @@ ADD requirements.txt ./
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Add the entire project, set some environment variables that will be used for flag
-# default values, and run in PLOT mode.
+# default values, and run in PLOT mode
 ADD . .
 ENV FIGURES_DIRECTORY=/usr/lib/serotonin/figures
 
-# ./flags is a flags file with the values to use for this run. There is a default flags
-# file in the repository, but it is overwritten with run-specific values during a
-# continuous deployment run.
-CMD [ "python3", "./app.py", "--mode=PLOT", "--flagfile=flagfile"]
+ENTRYPOINT "./entrypoint.sh"
