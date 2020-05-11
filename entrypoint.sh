@@ -8,7 +8,7 @@
 
 echo "Using build id ${PARAMS}"
 
-FLAGFILE=./flags/flags.${PARAMS}
+FLAGFILE=./flags/flags.${BUILD_ID}
 
 python3 ./app.py --mode=PLOT --flagfile="$FLAGFILE"
 
