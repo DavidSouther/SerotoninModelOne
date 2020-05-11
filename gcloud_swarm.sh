@@ -22,6 +22,7 @@ for F in $(ls flags) ; do
         --image=$IMAGE \
         --replicas=1 \
         --restart="Never" \
+        --requests="memory=512Mi" \
         --env="BUILD_ID=$FLAGS" \
         --env="SERVICE_AGENT_PASSPHRASE=${SERVICE_AGENT_PASSPHRASE}"
 done
